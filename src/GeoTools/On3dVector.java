@@ -2,6 +2,9 @@ package GeoTools;
 public class On3dVector {
 	public float x, y, z;
 	/////////////////////////////////
+	public  static On3dVector Xaxis(){return new On3dVector (1,0,0);}
+	public  static On3dVector Yaxis(){return new On3dVector (0,1,0);}
+	public  static On3dVector Zaxis(){return new On3dVector (0,0,1);}
 	void Rotate(float angle,On3dVector axis )
 		{
 		  Rotate((float) Math.sin(angle), (float) Math.cos(angle), axis );
@@ -170,6 +173,10 @@ public class On3dVector {
 	  {
 	    return new On3dVector( a.x*b.x, a.y*b.y, a.z*b.z );
 	  }
+	  public static On3dVector VectorMul(  float b,On3dVector a )
+		  {
+			    return new On3dVector( a.x*b, a.y*b, a.z*b );
+		 }
 	  public static On3dVector VectorMul( On3dVector a, float b )
 	  {
 	    return new On3dVector( a.x*b, a.y*b, a.z*b );

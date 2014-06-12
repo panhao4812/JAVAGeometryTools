@@ -43,8 +43,8 @@ public class test extends PApplet {
 		  amesh=new OnMesh();
 		size(600, 400, OPENGL);
 	
-		pts=iprt.readGCodeFile("C:/Users/Administrator/Desktop/PrintSTL/h1.gcode");
-		println(pts.size());
+	//	pts=iprt.readGCodeFile("C:/Users/Administrator/Desktop/PrintSTL/h1.gcode");
+		//println(pts.size());
 		// noLoop();
 		
 		
@@ -54,15 +54,20 @@ public class test extends PApplet {
 		specular(255, 255, 255);
 	    shininess(16.0f);// */
 	    smooth();
-	   /* 
-		amesh=iprt.read3dsFile("land.3ds");
+	   
+		amesh=iprt.read3dsFile("land1.3ds");
+		amesh.CombineIdenticalVertices();
+		OnXform xf=new OnXform();
+		xf.Scale(new On3dPoint(-2,0,0),5);
+		xf.printme();
+	amesh.Transform(xf);
 		println("minZ"+minZ);
 		println("maxZ"+maxZ);
 		c=new int[amesh.VertexCount()];
 		for(int i=0;i<c.length;i++){
 			On3dPoint p=(On3dPoint)amesh.Points.get(i);
-		c[i]=getGradient((p.z-minZ)/(maxZ-minZ)*(colors.size()-1));		
-		}*/
+		c[i]=slider.getGradient((p.z-minZ)/(maxZ-minZ));		
+		}
 		
 	}
 	public void draw() {
@@ -70,9 +75,11 @@ public class test extends PApplet {
 	
 		OnXform.DrawGrid(this);
     if (amesh.VertexCount()>0){
-    	stroke(0,10);
+    	stroke(0,250);
     	//noStroke();
-    	amesh.show(this,c);
+    	amesh.draw(this,1);
+    	stroke(100,100,255,140);
+    	amesh.drawNormals(this,13);
     }
 		
 		if(pts.size()>0){

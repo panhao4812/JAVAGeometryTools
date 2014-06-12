@@ -1,13 +1,14 @@
 package GeoTools;
 
 import java.util.ArrayList;
-
 import processing.core.PApplet;
 import processing.core.PConstants;
 public class OnMesh {	
 public	ArrayList<On3dPoint> Points=new ArrayList<On3dPoint>();
-public	ArrayList<QurdFace> qurds=new ArrayList<QurdFace>();
-public	ArrayList<TriangeFace> trianges=new ArrayList<TriangeFace>();
+public	ArrayList<MeshFace> faces=new ArrayList<MeshFace>();
+public	int[] colors;
+public	On3dVector[] normals;
+
 public OnMesh(){	
 }
 public OnMesh(OnMesh mesh){	
@@ -15,17 +16,14 @@ public OnMesh(OnMesh mesh){
 	for (int i=0;i<mesh.Points.size();i++){
 		Points.add(new On3dPoint(mesh.Points.get(i)));
 	}
-	this.qurds.clear();
-	for (int i=0;i<mesh.qurds.size();i++){
-		qurds.add(new QurdFace(mesh.qurds.get(i).a,mesh.qurds.get(i).b,mesh.qurds.get(i).c,mesh.qurds.get(i).d));
+	this.faces.clear();
+	for (int i=0;i<mesh.faces.size();i++){
+		faces.add(new MeshFace(mesh.faces.get(i).a,mesh.faces.get(i).b,mesh.faces.get(i).c,mesh.faces.get(i).d));
 	}
-	this.trianges.clear();
-	for (int i=0;i<mesh.trianges.size();i++){
-		trianges.add(new TriangeFace(mesh.trianges.get(i).a,mesh.trianges.get(i).b,mesh.trianges.get(i).c));
-	}
+
 }
 public int FaceCount(){
-	return qurds.size()+trianges.size();
+	return faces.size();
 }
 public int VertexCount(){
 	return Points.size();
@@ -37,16 +35,16 @@ public void SetVertex(On3dPoint P){
 	Points.add(P);
 }
 public void SetQuad(int index,int p1,int p2,int p3,int p4){
-	qurds.add(index, new QurdFace(p1,p2,p3,p4));
+	faces.add(index, new MeshFace(p1,p2,p3,p4));
 }
 public void SetQuad(int p1, int p2, int p3,int p4) {
-	qurds.add (new QurdFace(p1,p2,p3,p4));
+	faces.add( new MeshFace(p1,p2,p3,p4));
 }
 public void SetTriangle(int index, int p1, int p2, int p3) {
-	 trianges.add(index,new TriangeFace(p1,p2,p3));
+	faces.add(index, new MeshFace(p1,p2,p3));
 }
 public void SetTriangle(int p1, int p2, int p3) {
-	 trianges.add(new TriangeFace(p1,p2,p3));
+	faces.add( new MeshFace(p1,p2,p3));
 }
 public void Transform(OnXform xform ){
 	for(int i = 0;i < Points.size(); i ++){
@@ -138,52 +136,145 @@ public void CombineIdenticalVertices(){
        if (sign ){ pn.add(Points.get(i));arrn[i] = pn.size() - 1;}
 }
 this.Points=pn;
-for(int i=0;i<qurds.size();i++){
-	qurds.get(i).a=arrn[qurds.get(i).a];
-	qurds.get(i).b=arrn[qurds.get(i).b];
-	qurds.get(i).c=arrn[qurds.get(i).c];
-	qurds.get(i).d=arrn[qurds.get(i).d];
-}
-for(int i=0;i<trianges.size();i++){
-	trianges.get(i).a=arrn[trianges.get(i).a];
-	trianges.get(i).b=arrn[trianges.get(i).b];
-	trianges.get(i).c=arrn[trianges.get(i).c];
+for(int i=0;i<faces.size();i++){
+	faces.get(i).a=arrn[faces.get(i).a];
+	faces.get(i).b=arrn[faces.get(i).b];
+	faces.get(i).c=arrn[faces.get(i).c];
+	faces.get(i).d=arrn[faces.get(i).d];
 }
 }
-public void show(PApplet p){
+public void ComputeVertexNormals()
+{
+   int fcount = FaceCount();
+   int vcount = VertexCount();
+  int fi;
+  On3dVector[]  m_F=new   On3dVector[fcount];	
+  if ( fcount > 0 && vcount > 0 ) {
+	  m_F= ComputeFaceNormals();
+  }
+   normals = new On3dVector[vcount];
+      for ( fi = 0; fi < vcount; fi++ ) {
+    	  normals[fi]=new On3dVector();
+      }
+      for ( fi = 0; fi < fcount; fi++ ) {
+        MeshFace f = (MeshFace)faces.get(fi);    
+          normals[f.a].add(m_F[fi]);
+          normals[f.b].add(m_F[fi]);
+          normals[f.c].add(m_F[fi]);
+          if ( f.isquad() )normals[f.d].add(m_F[fi]);       
+      }
+      for ( fi = 0; fi < vcount; fi++ ) {
+    	  normals[fi].Unitize();
+      }   
+}
+
+public On3dVector[]  ComputeFaceNormals()
+{
+   int fcount = FaceCount();
+   On3dVector[] facenormals=new On3dVector[fcount];		   
+  if ( fcount > 0 )
+  {
+    On3dVector a, b, n;       
+      for (int fi = 0; fi < fcount; fi++ ) {
+        a =On3dPoint.PointSub(Points.get(faces.get(fi).c) , Points.get(faces.get(fi).a));
+        b =On3dPoint.PointSub(Points.get(faces.get(fi).d) , Points.get(faces.get(fi).b));
+        n =On3dVector.OnCrossProduct( a, b ); // works for triangles, quads, and nonplanar quads
+        n.Unitize();
+        facenormals[fi]=n;
+      }
+  }
+  return facenormals;
+}
+public On3dPoint[] faceCenter()
+{
+	On3dPoint[]cen=new On3dPoint[this.FaceCount()];
+	if(this.FaceCount()>0){
+	for(int i=0;i<cen.length;i++){	
+		  MeshFace f = (MeshFace)faces.get(i);    
+		cen[i]=new On3dPoint();
+		cen[i].add(this.Points.get(f.a));
+		cen[i].add(this.Points.get(f.b));
+		cen[i].add(this.Points.get(f.c));
+		if(f.isquad()){cen[i].add(this.Points.get(f.d));
+		cen[i].mul(0.25f);}else{cen[i].mul(1f/3f);}
+		}	
+	}return cen;
+}
+public void drawFaceNormals(PApplet p,float t){
+	On3dVector[]  m_F=ComputeFaceNormals() ;
+	 On3dPoint[]  m_cen=faceCenter();
+	 p.pushMatrix();
+		for (int i = 1; i < m_F.length; i++) {
+//p.println(m_cen[0].x+"/"+m_cen[0].y+"/"+m_cen[0].z);		
+			On3dPoint v1 = m_cen[i];m_F[i].mul(t);
+			On3dPoint v2 = On3dPoint.PointAdd(v1,m_F[i]);			
+			p.beginShape(PConstants.LINES);
+			p.vertex(v1.x, v1.y, v1.z);
+			p.vertex(v2.x, v2.y, v2.z);
+			p.endShape();	
+		}	
+		p.popMatrix();
+}
+public void drawNormals(PApplet p,float t){
+	ComputeVertexNormals();
+	 p.pushMatrix();
+		for (int i = 1; i < this.normals.length; i++) {	
+			On3dPoint v1 = Points.get(i);normals[i].mul(t);
+			On3dPoint v2 = On3dPoint.PointAdd(Points.get(i),normals[i]);	
+		//p.println(Points.get(0).x+"/"+Points.get(0).y+"/"+Points.get(0).z);			
+			p.beginShape(PConstants.LINES);
+			p.vertex(v1.x, v1.y, v1.z);
+			p.vertex(v2.x, v2.y, v2.z);
+			p.endShape();	
+		}	
+		p.popMatrix();
+}
+public void draw(PApplet p){draw(p,1);}
+public void draw(PApplet p,float t){
+	if(colors!=null){
+	if (this.colors.length==this.VertexCount()){show( p,this.colors,t);return;}
+	}
+	show(p,t);
+}
+ private void show(PApplet p,float t){
 	p.pushMatrix();
+	p.scale(t);
 	p.beginShape(PConstants.TRIANGLES);
-	for(int i=0;i<trianges.size();i++){
-		TriangeFace f=(TriangeFace)trianges.get(i);
+	for(int i=0;i<faces.size();i++){
+		MeshFace f=(MeshFace)faces.get(i);
+		if(f.istriangle()){
 		p.vertex(Points.get(f.a).x,Points.get(f.a).y,Points.get(f.a).z);
 		p.vertex(Points.get(f.b).x,Points.get(f.b).y,Points.get(f.b).z);
 		p.vertex(Points.get(f.c).x,Points.get(f.c).y,Points.get(f.c).z);
 	}	
+	}
 	p.endShape();
 	p.beginShape(PConstants.QUADS);
-	for(int i=0;i<qurds.size();i++){
-	QurdFace f=(QurdFace)qurds.get(i);
+	for(int i=0;i<faces.size();i++){
+		MeshFace f=(MeshFace)faces.get(i);
+		if(f.isquad()){
 	p.vertex(Points.get(f.a).x,Points.get(f.a).y,Points.get(f.a).z);
 	p.vertex(Points.get(f.b).x,Points.get(f.b).y,Points.get(f.b).z);
 	p.vertex(Points.get(f.c).x,Points.get(f.c).y,Points.get(f.c).z);
 	p.vertex(Points.get(f.d).x,Points.get(f.d).y,Points.get(f.d).z);
+		}
 	}
 	p.endShape();
 	p.popMatrix();
 }
-public void show(PApplet p,int[] c){
-	p.pushMatrix();
+private void show(PApplet p,int[] c,float t){
+	p.pushMatrix();p.scale(t);
 	p.beginShape(PConstants.TRIANGLES);
-	for(int i=0;i<trianges.size();i++){
-		TriangeFace f=(TriangeFace)trianges.get(i);	
+	for(int i=0;i<faces.size();i++){
+		MeshFace f=(MeshFace)faces.get(i);		
 		p.fill(c[f.a]);	p.vertex(Points.get(f.a).x,Points.get(f.a).y,Points.get(f.a).z);
 		p.fill(c[f.b]);	p.vertex(Points.get(f.b).x,Points.get(f.b).y,Points.get(f.b).z);
 		p.fill(c[f.c]);	p.vertex(Points.get(f.c).x,Points.get(f.c).y,Points.get(f.c).z);
 	}	
 	p.endShape();
 	p.beginShape(PConstants.QUADS);
-	for(int i=0;i<qurds.size();i++){
-	QurdFace f=(QurdFace)qurds.get(i);
+	for(int i=0;i<faces.size();i++){
+		MeshFace f=(MeshFace)faces.get(i);
 	p.fill(c[f.a]);p.vertex(Points.get(f.a).x,Points.get(f.a).y,Points.get(f.a).z);
 	p.fill(c[f.b]);p.vertex(Points.get(f.b).x,Points.get(f.b).y,Points.get(f.b).z);
 	p.fill(c[f.c]);p.vertex(Points.get(f.c).x,Points.get(f.c).y,Points.get(f.c).z);
@@ -332,7 +423,7 @@ public static OnMesh loft2Mesh(ArrayList< ArrayList<On3dPoint>> pll){
         mesh.SetVertex(i2, p2);
         mesh.SetVertex(i3, p3);
         mesh.SetVertex(i4, p4);
-        mesh.SetQuad(mesh.qurds.size(), i1, i2, i3, i4);
+        mesh.SetQuad(mesh.faces.size(), i1, i2, i3, i4);
         if (j == pll.size() - 2 ) cen.add( pts2.get(i));	         
     }
     }
@@ -349,7 +440,7 @@ public static OnMesh loft2Mesh(ArrayList< ArrayList<On3dPoint>> pll){
       mesh.SetVertex(i1, p1);
       mesh.SetVertex(i2, p2);
       mesh.SetVertex(i3, cen);
-      mesh.SetTriangle(mesh.trianges.size(), i1, i2, i3);
+      mesh.SetTriangle(mesh.faces.size(), i1, i2, i3);
     }
 
    // mesh.CombineIdenticalVertices()

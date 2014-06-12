@@ -8,7 +8,8 @@ public class ColorSlider {
 	PApplet p;
 	public ColorSlider(PApplet parent){p=parent;}
 public ArrayList<Integer> colors = new ArrayList<Integer>();
-	int getGradient(float value) {
+	public int getGradient(float value) {
+		value*=colors.size()-1;
 		if (colors.size() == 0)
 			return 0x000000;
 		if (value <= 0.0)
@@ -20,5 +21,4 @@ public ArrayList<Integer> colors = new ArrayList<Integer>();
 		int c2 = (int) colors.get(color_index + 1);
 		return p.lerpColor(c1, c2, value - color_index);
 	}
-
 }
