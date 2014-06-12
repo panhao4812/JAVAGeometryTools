@@ -9,16 +9,18 @@ public class ControlFrame extends PApplet {
     size(w, h);
     frameRate(25);
     cp5 = new ControlP5(this);   
-    cp5.addSlider("Bay").plugTo(parent,"Bay").setRange(120, 200).setPosition(20,10);
-    cp5.addSlider("height").plugTo(parent,"height").setRange(100, 200).setPosition(20,50);
-    cp5.addSlider("size").plugTo(parent,"size").setRange(1, 5).setPosition(20,90);
+    cp5.addSlider("Range").plugTo(parent,"Range").setRange(0, PI).setPosition(20,10);
+   // cp5.addSlider("Bay").plugTo(parent,"Bay").setRange(120, 200).setPosition(20,10);
+   // cp5.addSlider("height").plugTo(parent,"height").setRange(100, 200).setPosition(20,50);
+  //  cp5.addSlider("size").plugTo(parent,"size").setRange(1, 5).setPosition(20,90);
   }
 
   public void draw() {
       background(0);
   }
   
-  private ControlFrame() { }
+  @SuppressWarnings("unused")
+private ControlFrame() { }
   public ControlFrame(Object theParent, int theWidth, int theHeight) {
     parent = theParent;
     w = theWidth;

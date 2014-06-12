@@ -538,8 +538,44 @@ public float[][] get_m_xform(){
 		this.mul(s0);
 		this.mul(t0);
 	}
+	public static void DrawWhiteGrid(PApplet p) {
+		float gridSize = 4;
+		// strokeWeight(0.5f);
+		for (int x = -64; x < 65; x++) {
+			p.stroke(250, 12);
+			if (x % 8 == 0) {
+				p.stroke(255, 32);
+			}
+			if (x == 0) {
+				p.line(0, 0, 0, -254, 0, 0);
+			} else {
+				p.line(x * gridSize, -64 * gridSize, 0, x * gridSize,
+						64 * gridSize, 0);
+			}
+		}
 
-	public static void DrawGrid(PApplet p) {
+		for (int y = -64; y < 65; y++) {
+			p.stroke(250, 12);
+			if (y % 8 == 0) {
+				p.stroke(255, 32);
+			}
+			if (y == 0) {
+				p.line(0, 0, 0, 0, -254, 0);
+			} else {
+				p.line(-64 * gridSize, y * gridSize, 0, 64 * gridSize, y
+						* gridSize, 0);
+			}
+		}
+		// strokeWeight(1f);
+		p.stroke(255, 0, 0);
+		p.line(0, 0, 0, 254, 0, 0);
+		p.stroke(0, 255, 0);
+		p.line(0, 0, 0, 0, 254, 0);
+
+		// stroke(0,0,255);
+		// line(0,0,0,0,0,254);
+	}
+	public static void DrawDarkGrid(PApplet p) {
 		float gridSize = 4;
 		// strokeWeight(0.5f);
 		for (int x = -64; x < 65; x++) {

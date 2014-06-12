@@ -1,21 +1,28 @@
 package GeoTools;
+
+import peasy.org.apache.commons.math.geometry.Vector3D;
+
 public class On3dVector {
 	public float x, y, z;
 	/////////////////////////////////
 	public  static On3dVector Xaxis(){return new On3dVector (1,0,0);}
 	public  static On3dVector Yaxis(){return new On3dVector (0,1,0);}
 	public  static On3dVector Zaxis(){return new On3dVector (0,0,1);}
-	void Rotate(float angle,On3dVector axis )
+	public void Rotate(float angle){
+		 Rotate(angle,On3dVector.Zaxis());
+	}
+	public void Rotate(float angle,On3dVector axis )
 		{
 		  Rotate((float) Math.sin(angle), (float) Math.cos(angle), axis );
 		}
-	void Rotate( float sin_angle,float cos_angle, On3dVector axis )
+	public void Rotate( float sin_angle,float cos_angle, On3dVector axis )
 		{
 		  //bool rc = false;
 		  OnXform rot=new OnXform();
 		  rot.Rotation( sin_angle, cos_angle, axis, new On3dPoint(0,0,0) );
 		  Transform(rot);
 		}
+	
 	public void Transform(OnXform xform )
 	{
 		float xx,yy,zz;
@@ -191,6 +198,19 @@ public class On3dVector {
 	     float crossY = (a.z * b.x - b.z * a.x);
 	     float crossZ = (a.x * b.y - b.x * a.y);
 	     return( new On3dVector(crossX, crossY, crossZ) );
+	  }
+	  public static double VectorAngle( On3dVector a, On3dVector b){
+		  a.Unitize() ;b.Unitize();	 
+		    double d = ((a.x * b.x) + (a.y * b.y)) + (a.z * b.z);
+		    if (d > 1.0)
+		    {
+		        d = 1.0;
+		    }
+		    if (d < -1.0)
+		    {
+		        d = -1.0;
+		    }
+		    return Math.acos(d);  
 	  }
 	//////////////////////////////
 	public float LengthSquared() {
