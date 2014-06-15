@@ -15,6 +15,7 @@ public class test extends PApplet {
 	float Range=0,Dir=0.5f;
 	ControlFrame cf;
 	On3dVector dir;
+	float minZ=PI,maxZ=0;float range2=0;float Dir2=0;
 	ControlFrame addControlFrame(String theName, int theWidth, int theHeight) {
 		  Frame f = new Frame(theName);
 		  ControlFrame p = new ControlFrame(this, theWidth, theHeight);
@@ -67,11 +68,26 @@ public class test extends PApplet {
 	    	println(amesh4.Points.get(i).x+","+amesh4.Points.get(i).y+","+amesh4.Points.get(i).z);
 	    }	
 	    */ 
+	 
 	}
+	float[] t;
 	public void caculate(){
-		 minZ=PI;maxZ=0;	 dir=On3dVector.Xaxis();
+		if(Range!=range2 ){
+		   minZ=Float.MAX_VALUE;maxZ=0;	
+		    PerlinNoise noise=new PerlinNoise();
+			t=new float[amesh.normals.length];
+			for(int i=0;i<amesh.normals.length;i++){
+					
+				t[i]=(float) SimplexNoise.noise(amesh.Points.get(i).x, amesh.Points.get(i).y);
+				if(minZ>t[i])minZ=t[i];
+				if(maxZ<t[i])maxZ=t[i];
+			}
+			println(maxZ);
+			println(minZ);
+		}
+		/* minZ=PI;maxZ=0;	 dir=On3dVector.Xaxis();
 			dir.Rotate(Range);
-			float[] t=new float[amesh.normals.length];
+		
 			for(int i=0;i<amesh.normals.length;i++){
 				On3dVector v=amesh.normals[i];	
 				t[i]=(float)On3dVector.VectorAngle(v,dir);
@@ -82,13 +98,17 @@ public class test extends PApplet {
 			amesh.colors[i]=slider.getGradient((t[i]-minZ)/(maxZ-minZ));	
 			}
 			println("max:"+maxZ);	println("min:"+minZ);	
+			*/
+
+	
 		OnMesh[] M= OnMesh.followlines2(amesh,amesh3,amesh4 ,t,Dir*(maxZ-minZ)+minZ);
 		amesh3=M[0];amesh4=M[1];
-            print("m3 "+ amesh3.VertexCount());
-            print("m4 "+ amesh4.VertexCount());
+	
+           // print("m3 "+ amesh3.VertexCount());
+           // print("m4 "+ amesh4.VertexCount());
 		    //return new OnMesh();
 	}
-	float minZ=PI,maxZ=0;float range2=0;float Dir2=0;
+	
 	public void draw() {
 		background(30);
 		if((Range!=range2 )||(Dir!=Dir2)){ 
@@ -98,23 +118,20 @@ public class test extends PApplet {
 		}
 		OnXform.DrawWhiteGrid(this);
     if (amesh.VertexCount()>0){
-    	stroke(0,20);
+    	noStroke();
+   
     	//
-    	//amesh.draw(this,1);
-    	fill(255,0,0);stroke(60);
-    //	amesh2.draw(this,1);	
+    	//amesh.draw(this,1);   	
+    	//stroke(0,20);
+    	fill(255,255,255);
+     	amesh2.draw(this,1);
+     	//stroke(0,40);
+     	fill(255,0,0);
     	amesh3.draw(this,1);  
-    	fill(255,255,255);noStroke();
-    if(keyPressed)amesh4.draw(this,1);
+    	fill(0,255,255);
+         amesh4.draw(this,1);
     }   
 	}
-		void showPoint(On3dPoint p) {
-		noStroke();
-		fill(150, 0, 0);
-		pushMatrix();
-		translate(p.x, p.y, p.z);
-		sphere(0.6f);
-		popMatrix();
-	}
+
 	// /////////////////////////////////////////////////////////////
 }
