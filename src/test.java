@@ -5,6 +5,7 @@ import GeoTools.*;
 import peasy.PeasyCam;
 import processing.core.PApplet;
 import processing.core.PConstants;
+
 public class test extends PApplet {
 	private static final long serialVersionUID = 1L;
 	PeasyCam cam;
@@ -89,7 +90,7 @@ public class test extends PApplet {
 	}
 	float minZ=PI,maxZ=0;float range2=0;float Dir2=0;
 	public void draw() {
-		background(230);
+		background(30);
 		if((Range!=range2 )||(Dir!=Dir2)){ 
 			caculate();
 			range2=Range;
@@ -98,13 +99,13 @@ public class test extends PApplet {
 		OnXform.DrawWhiteGrid(this);
     if (amesh.VertexCount()>0){
     	stroke(0,20);
-    	//noStroke();
+    	//
     	//amesh.draw(this,1);
-    	fill(255,0,0);stroke(0,20);
+    	fill(255,0,0);stroke(60);
     //	amesh2.draw(this,1);	
     	amesh3.draw(this,1);  
-    	fill(255,255,255);stroke(0,20);
-    	amesh4.draw(this,1);
+    	fill(255,255,255);noStroke();
+    if(keyPressed)amesh4.draw(this,1);
     }   
 	}
 		void showPoint(On3dPoint p) {
