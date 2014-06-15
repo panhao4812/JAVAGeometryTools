@@ -10,6 +10,7 @@ public class ControlFrame extends PApplet {
     frameRate(25);
     cp5 = new ControlP5(this);   
     cp5.addSlider("Range").plugTo(parent,"Range").setRange(0, PI).setPosition(20,10);
+    cp5.addSlider("Dir").plugTo(parent,"Dir").setRange(0, 1).setPosition(20,40);
    // cp5.addSlider("Bay").plugTo(parent,"Bay").setRange(120, 200).setPosition(20,10);
    // cp5.addSlider("height").plugTo(parent,"height").setRange(100, 200).setPosition(20,50);
   //  cp5.addSlider("size").plugTo(parent,"size").setRange(1, 5).setPosition(20,90);

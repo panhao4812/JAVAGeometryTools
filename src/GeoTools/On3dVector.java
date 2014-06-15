@@ -1,7 +1,5 @@
 package GeoTools;
 
-import peasy.org.apache.commons.math.geometry.Vector3D;
-
 public class On3dVector {
 	public float x, y, z;
 	/////////////////////////////////

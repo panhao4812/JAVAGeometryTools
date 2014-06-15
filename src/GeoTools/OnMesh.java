@@ -22,6 +22,17 @@ public OnMesh(OnMesh mesh){
 	}
 
 }
+public void Append(OnMesh mesh){
+	int n=this.VertexCount();	
+	for(int i=0;i<mesh.FaceCount();i++){
+		MeshFace mf=mesh.faces.get(i);
+	//PApplet.println(n);
+		this.faces.add(new MeshFace(mf.a+n,mf.b+n,mf.c+n,mf.d+n));
+	}
+	for(int i=0;i<mesh.VertexCount();i++){
+		this.Points.add(mesh.Points.get(i));
+	}
+}
 public int FaceCount(){
 	return faces.size();
 }
@@ -57,7 +68,7 @@ public On3dVector ONTriangleNormal(On3dPoint A,On3dPoint B,On3dPoint C)
 {
   // N = normal to triangle's plane
 	On3dVector N=new On3dVector();
-  double a, b, c, d;
+  float a, b, c, d;
   N.x = A.y*(B.z-C.z) + B.y*(C.z-A.z) + C.y*(A.z-B.z);
   N.y = A.z*(B.x-C.x) + B.z*(C.x-A.x) + C.z*(A.x-B.x);
   N.z = A.x*(B.y-C.y) + B.x*(C.y-A.y) + C.x*(A.y-B.y);
@@ -72,7 +83,7 @@ public On3dVector ONTriangleNormal(On3dPoint A,On3dPoint B,On3dPoint C)
       // c is largest
       if ( c >Float.MIN_VALUE)
       {
-        a /= c; b /= c; d = c*Math.sqrt(1.0 + a*a + b*b);
+        a /= c; b /= c; d = (float) (c*Math.sqrt(1.0 + a*a + b*b));
       }
       else
       {
@@ -84,7 +95,7 @@ public On3dVector ONTriangleNormal(On3dPoint A,On3dPoint B,On3dPoint C)
       if ( b > Float.MIN_VALUE )
       {
         // b is largest
-        a /= b; c /= b; d = b*Math.sqrt(1.0 + c*c + a*a);
+        a /= b; c /= b; d = (float) (b*Math.sqrt(1.0 + c*c + a*a));
       }
       else
       {
@@ -97,7 +108,7 @@ public On3dVector ONTriangleNormal(On3dPoint A,On3dPoint B,On3dPoint C)
     // c is largest
     if ( c >Float.MIN_VALUE )
     {
-      a /= c; b /= c; d = c*Math.sqrt(1.0 + a*a + b*b);
+      a /= c; b /= c; d = (float) (c*Math.sqrt(1.0 + a*a + b*b));
     }
     else
     {
@@ -107,7 +118,7 @@ public On3dVector ONTriangleNormal(On3dPoint A,On3dPoint B,On3dPoint C)
   else if ( a > Float.MIN_VALUE )
   {
     // a is largest
-    b /= a; c /= a; d = a*Math.sqrt(1.0 + b*b + c*c);
+    b /= a; c /= a; d = (float) (a*Math.sqrt(1.0 + b*b + c*c));
   }
   else
   {
@@ -447,6 +458,123 @@ public static OnMesh loft2Mesh(ArrayList< ArrayList<On3dPoint>> pll){
     //mesh.ComputeFaceNormals()
     return mesh;
 }
+////////////
+public static OnMesh[]  followlines2(OnMesh mesh,OnMesh mesh1, OnMesh mesh2,float[] t, float iso)
+{OnMesh[]  M=new OnMesh[2];
+	 mesh1 = new OnMesh();
+	 mesh2 = new OnMesh();
+    for (int i = 0; i < mesh.faces.size(); i++)
+    {
+        if (mesh.faces.get(i).istriangle())
+        {
+        	int a=mesh.faces.get(i).a;
+        	int b=mesh.faces.get(i).b;
+        	int c=mesh.faces.get(i).c;
+        //	PApplet.println(a+"/"+b+"/"+c+"/");
+        
+            On3dPoint p1 = mesh.Points.get(a);
+            On3dPoint p2 = mesh.Points.get(b);
+            On3dPoint p3 = mesh.Points.get(c);
+            float t1 = t[a];
+            float t2 = t[b];
+            float t3 = t[c];
+            Solve3Face(p1, p2, p3, t1, t2, t3, iso, mesh1,mesh2);
+        //    PApplet.println(ls.FaceCount()+"/"+ls.Points.size());
+        }
+    }
+    M[0]=mesh1;M[1]=mesh2;
+    return M;
+}
+public static boolean Solve3Face(On3dPoint p1, On3dPoint p2, On3dPoint p3,
+		float t1, float t2, float t3, float iso, OnMesh mesh,OnMesh mesh2)
+{
+	int n=mesh.VertexCount();int n2=mesh2.VertexCount();
+	  On3dPoint[] L2 = new On3dPoint[3];
+      L2[0]=p1; L2[1]=p2; L2[2]=p3; 
+      
+    int square_idx = 0;
+    if (t1 < iso) square_idx |= 1;
+    if (t2 < iso) square_idx |= 2;
+    if (t3 < iso) square_idx |= 4;
+    int a = TriLine[square_idx][0];
+    int b = TriLine[square_idx][1];
+    int c = TriLine[square_idx][2];
+    int d = TriLine[square_idx][3];
+    int P3,P4;
+    if(c==0){P3=1;P4=2;}
+    if(c==1){P3=2;P4=0;}
+    else {P3=0;P4=1;}
+    
+    if (a == -1)
+    {  
+        mesh2.Points.add(p1); mesh2.Points.add(p2); mesh2.Points.add(p3);
+        mesh2.faces.add(new MeshFace(0+n2, 1+n2, 2+n2));
+        return true;
+    }
+    
+    if (a != -1)
+    {
+    
+        if (a == -2)
+        {
+            mesh.Points.add(p1); mesh.Points.add(p2); mesh.Points.add(p3);
+            mesh.faces.add(new MeshFace(0+n, 1+n, 2+n));
+  
+            return true;
+        }
+      
+        
+        ArrayList<On3dPoint> L = new ArrayList<On3dPoint>();
+        On3dPoint ve1,ve2;
+        ve1=On3dPoint.PointMul(p2,(t1 - iso) / (t1 - t2) );
+        ve2=On3dPoint.PointMul(p1,(iso - t2) / (t1 - t2) );
+        L.add(On3dPoint.PointAdd(ve1,ve2));
+        ve1=On3dPoint.PointMul(p3,(t2 - iso) / (t2 - t3) );
+        ve2=On3dPoint.PointMul(p2,(iso - t3) / (t2 - t3) );
+        L.add(On3dPoint.PointAdd(ve1,ve2));
+        ve1=On3dPoint.PointMul(p1,(t3 - iso) / (t3 - t1) );
+        ve2=On3dPoint.PointMul(p3,(iso - t1) / (t3 - t1) );
+        L.add(On3dPoint.PointAdd(ve1,ve2));
+             
+        mesh.Points.add(L.get(a));
+        mesh.Points.add(L.get(b));
+        mesh.Points.add(L2[c]);
+            
+        mesh2.Points.add(L.get(b));
+        mesh2.Points.add(L.get(a));
+       
+        if (d != -1)
+        {
+        	if(d==P4) {mesh2.Points.add(L2[P3]);}
+        	else{mesh2.Points.add(L2[P4]);}
+        	mesh2.faces.add(new MeshFace(0+n2, 1+n2, 2+n2));  
+        	
+            mesh.Points.add(L2[d]);
+            mesh.faces.add(new MeshFace(0+n, 1+n, 2+n, 3+n));         
+        }
+        else {
+        	 mesh2.Points.add(L2[P3]);
+        	 mesh2.Points.add(L2[P4]);
+             mesh2.faces.add(new MeshFace(0+n2, 1+n2, 2+n2, 3+n2));   
+            
+        	mesh.faces.add(new MeshFace(0+n, 1+n, 2+n)); }   
+        return true;
+    }
+    return false;
+}
+
+
+static int[][] TriLine = {
+    {-1, -1,-1,-1} ,
+    { 0, 2,0,-1} ,
+    { 1, 0,1,-1} ,
+    { 1, 2,0,1} ,
+    { 2, 1,2,-1} ,
+    { 0, 1,2,0} ,
+    { 2, 0,1,2} ,
+    {-2,-1, -1,-1} ,
+    };
+
 
 
 }

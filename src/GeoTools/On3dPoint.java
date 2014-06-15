@@ -113,6 +113,13 @@ public class On3dPoint {
 	    return (float)Math.sqrt( (x*x) + (y*y) + (z*z) );
 	  } 
 	/////////////////////////////////////////Static functions
+	public static On3dPoint  PointMul(On3dPoint p, float s )
+	  {
+	 float x=  p.x * s;
+	 float y = p.y * s;
+	 float z  =p.z * s;
+	    return new On3dPoint(x,y,z);
+	  }
 	 public static On3dPoint PointAdd( On3dPoint a, On3dPoint b )
 	  {
 	    return new On3dPoint( a.x+b.x, a.y+b.y, a.z+b.z );
