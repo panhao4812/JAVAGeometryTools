@@ -52,8 +52,12 @@ public class test extends PApplet {
 	    shininess(16.0f);// */
 	    smooth();
 	  //  amesh3=iprt.read3dsFile("land3.3ds");
-	    amesh2=iprt.read3dsFile("land2.3ds");
-		amesh=iprt.read3dsFile("land1.3ds");	
+	  //  amesh2=iprt.read3dsFile("t2.3ds");
+		amesh=iprt.read3dsFile("rabbit.3ds");	
+		amesh.Append(iprt.read3dsFile("rabbit2.3ds"));	
+		amesh.Append(iprt.read3dsFile("rabbit3.3ds"));	
+		amesh.Append(iprt.read3dsFile("rabbit4.3ds"));	
+		
 		amesh.CombineIdenticalVertices();
 		OnXform xf=new OnXform();
 		xf.Scale(new On3dPoint(-2,0,0),5);
@@ -78,7 +82,8 @@ public class test extends PApplet {
 			t=new float[amesh.normals.length];
 			for(int i=0;i<amesh.normals.length;i++){
 					
-				t[i]=(float) SimplexNoise.noise(amesh.Points.get(i).x, amesh.Points.get(i).y);
+				t[i]=(float) SimplexNoise.noise(amesh.Points.get(i).x/(Range+0.1f)*0.05f,
+						amesh.Points.get(i).y/(Range+0.1f)*0.01f,amesh.Points.get(i).z/(Range+0.1f)*0.05f);
 				if(minZ>t[i])minZ=t[i];
 				if(maxZ<t[i])maxZ=t[i];
 			}
@@ -118,18 +123,19 @@ public class test extends PApplet {
 		}
 		OnXform.DrawWhiteGrid(this);
     if (amesh.VertexCount()>0){
-    	noStroke();
+    
    
     	//
     	//amesh.draw(this,1);   	
-    	//stroke(0,20);
+    stroke(0,20);
     	fill(255,255,255);
-     	amesh2.draw(this,1);
+     	//amesh2.draw(this,1);
+    	noStroke();
      	//stroke(0,40);
-     	fill(255,0,0);
+     	fill(145,200,65);
     	amesh3.draw(this,1);  
-    	fill(0,255,255);
-         amesh4.draw(this,1);
+    	fill(90,170,125);
+       if(keyPressed)  amesh4.draw(this,1);
     }   
 	}
 
