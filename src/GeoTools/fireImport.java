@@ -173,5 +173,48 @@ public	float readFloat( DataInputStream objBinaryReader){
 				  } 
 		 return pts;
 	}
-
+	public OnMesh readobjFile(String fileName){
+	OnMesh amesh=new OnMesh();
+		try {  
+			  FileReader read = new FileReader(fileName);
+			   @SuppressWarnings("resource")
+			BufferedReader br = new BufferedReader(read);
+			   String row="";
+			   int blank=0;			
+			   while(blank<10){			  		 
+				   row = br.readLine();
+				   if(row!=null){			  
+					  blank=0;
+			  String[] p=row.split(" ");
+			if(p.length>0){if(p.length>=4){ 
+		if(p[0].equals("v")){			
+			 float xx=Float.parseFloat(p[1]);
+			 float yy=Float.parseFloat(p[2]);
+			 float zz=Float.parseFloat(p[3]);
+			 amesh.Points.add(new On3dPoint(xx,yy,zz));			
+		}
+		if(p[0].equals("f")){
+			 int p1=Integer.parseInt(p[1].split("/")[0]);
+			 int p2=Integer.parseInt(p[2].split("/")[0]);
+			 int p3=Integer.parseInt(p[3].split("/")[0]);
+			 int p4=p3;			
+			if(p.length==5){
+			 p4=Integer.parseInt(p[4].split("/")[0]);
+	     	}
+			amesh.faces.add(new MeshFace(p1-1,p2-1,p3-1,p4-1));	
+		}		
+			}
+			}
+			   }else{
+				   blank++;	
+				   PApplet.println("blanklines");
+			   }
+			   }
+			  }catch (FileNotFoundException e) {				  
+				  PApplet.println(e.toString());
+				  } catch (IOException e){
+					  PApplet.println(e.toString());
+				  } 	
+		return amesh;
+	}
 }

@@ -86,12 +86,12 @@ public float[][] get_m_xform(){
 		}
 	}
 
-	void Identity() {
+	public void Identity() {
 		Zero();
 		m_xform[0][0] = m_xform[1][1] = m_xform[2][2] = m_xform[3][3] = 1.0f;
 	}
 
-	void Rotation(float angle, On3dVector axis, On3dPoint center) {
+	public void Rotation(float angle, On3dVector axis, On3dPoint center) {
 		this.Rotation((float) Math.sin(angle), (float) Math.cos(angle), axis,
 				center);
 	}
@@ -112,7 +112,29 @@ public float[][] get_m_xform(){
 		Rotation(sin_angle, cos_angle, axis, rotation_center);
 	}
 
-	void Rotation(float sin_angle, float cos_angle, On3dVector axis,
+	public boolean ChangeBasis(On3dPoint P0, On3dVector X0, On3dVector Y0,
+			On3dVector Z0, On3dPoint P1, On3dVector X1, On3dVector Y1,
+			On3dVector Z1) {
+		boolean rc = false;
+		// Q = P0 + a0*X0 + b0*Y0 + c0*Z0 = P1 + a1*X1 + b1*Y1 + c1*Z1
+		// then this transform will map the point (a0,b0,c0) to (a1,b1,c1)
+	
+		OnXform F0 = new OnXform(P0, X0, Y0, Z0); // Frame 0
+	
+		// T1 translates by -P1
+		OnXform T1 = new OnXform();
+		T1.Translation(-P1.x, -P1.y, -P1.z);
+		OnXform CB = new OnXform();
+		rc = CB.ChangeBasis(new On3dVector(1, 0, 0), new On3dVector(0, 1, 0),
+				new On3dVector(0, 0, 1), X1, Y1, Z1);
+		CB.mul(T1);
+		CB.mul(F0);
+		// System.out.println("cb="+CB.ToString());
+		this.m_xform = CB.m_xform;
+		return rc;
+	}
+
+	public void Rotation(float sin_angle, float cos_angle, On3dVector axis,
 			On3dPoint center) {
 		Identity();
 		if (Math.abs(sin_angle) >= 1.0f - Float.MIN_VALUE
@@ -450,28 +472,6 @@ public float[][] get_m_xform(){
 		return true;
 	}
 
-	public boolean ChangeBasis(On3dPoint P0, On3dVector X0, On3dVector Y0,
-			On3dVector Z0, On3dPoint P1, On3dVector X1, On3dVector Y1,
-			On3dVector Z1) {
-		boolean rc = false;
-		// Q = P0 + a0*X0 + b0*Y0 + c0*Z0 = P1 + a1*X1 + b1*Y1 + c1*Z1
-		// then this transform will map the point (a0,b0,c0) to (a1,b1,c1)
-
-		OnXform F0 = new OnXform(P0, X0, Y0, Z0); // Frame 0
-
-		// T1 translates by -P1
-		OnXform T1 = new OnXform();
-		T1.Translation(-P1.x, -P1.y, -P1.z);
-		OnXform CB = new OnXform();
-		rc = CB.ChangeBasis(new On3dVector(1, 0, 0), new On3dVector(0, 1, 0),
-				new On3dVector(0, 0, 1), X1, Y1, Z1);
-		CB.mul(T1);
-		CB.mul(F0);
-		// System.out.println("cb="+CB.ToString());
-		this.m_xform = CB.m_xform;
-		return rc;
-	}
-
 	public void Scale(float x, float y, float z) {
 		this.Zero();
 		m_xform[0][0] = x;
@@ -510,7 +510,7 @@ public float[][] get_m_xform(){
 				On3dVector.VectorMul(z_scale_factor, plane.zaxis));
 	}
 
-	void Shear(OnPlane plane, On3dVector x1, On3dVector y1, On3dVector z1) {
+	public void Shear(OnPlane plane, On3dVector x1, On3dVector y1, On3dVector z1) {
 		OnXform t0 = new OnXform(), t1 = new OnXform(), s0 = new OnXform(1), s1 = new OnXform(
 				1);
 		t0.Translation(On3dPoint.PointSub(new On3dPoint(), plane.origin));

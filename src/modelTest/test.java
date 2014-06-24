@@ -1,10 +1,9 @@
-
+package modelTest;
 import java.awt.Frame;
 import controlP5.ControlP5;
 import GeoTools.*;
 import peasy.PeasyCam;
 import processing.core.PApplet;
-import processing.core.PConstants;
 
 public class test extends PApplet {
 	private static final long serialVersionUID = 1L;
@@ -51,16 +50,16 @@ public class test extends PApplet {
 		specular(255, 255, 255);
 	    shininess(16.0f);// */
 	    smooth();
-	  //  amesh3=iprt.read3dsFile("land3.3ds");
+	   amesh=iprt.readobjFile("land1.obj");
 	  //  amesh2=iprt.read3dsFile("t2.3ds");
-		amesh=iprt.read3dsFile("rabbit.3ds");	
-		amesh.Append(iprt.read3dsFile("rabbit2.3ds"));	
-		amesh.Append(iprt.read3dsFile("rabbit3.3ds"));	
-		amesh.Append(iprt.read3dsFile("rabbit4.3ds"));	
+	//	amesh=iprt.read3dsFile("rabbit.3ds");	             
+	//	amesh.Append(iprt.read3dsFile("rabbit2.3ds"));	
+	//	amesh.Append(iprt.read3dsFile("rabbit3.3ds"));	
+	//.Append(iprt.read3dsFile("rabbit4.3ds"));	
 		
 		amesh.CombineIdenticalVertices();
 		OnXform xf=new OnXform();
-		xf.Scale(new On3dPoint(-2,0,0),5);
+		xf.Scale(new On3dPoint(0,0,0),4             );
 	    amesh.Transform(xf);amesh2.Transform(xf);amesh3.Transform(xf);
 	    amesh.ComputeVertexNormals();
 	    amesh.colors=new int[amesh.VertexCount()];
@@ -80,10 +79,18 @@ public class test extends PApplet {
 		   minZ=Float.MAX_VALUE;maxZ=0;	
 		    PerlinNoise noise=new PerlinNoise();
 			t=new float[amesh.normals.length];
-			for(int i=0;i<amesh.normals.length;i++){
-					
-				t[i]=(float) SimplexNoise.noise(amesh.Points.get(i).x/(Range+0.1f)*0.05f,
-						amesh.Points.get(i).y/(Range+0.1f)*0.01f,amesh.Points.get(i).z/(Range+0.1f)*0.05f);
+			for(int i=0;i<amesh.normals.length;i++){				
+				float x=amesh.Points.get(i).x*Range;
+				float y=amesh.Points.get(i).y*Range;
+				float z=amesh.Points.get(i).z*Range;
+				
+				t[i]=sin(26*atan2(x,y)) +sin(26*atan2(y,z)) +sin(26*atan2(z,x));
+				//t[i]=pow(sin(5*x),2) + pow(cos(5*y),2) +pow(cos(5*z),2)- 1.3f;
+		/*
+		 * 
+				Cnd:  sin(16*atan2(x,y)+2*sin(2*z))>0 
+				Cnd:  sin(26*atan2(x,y)) +sin(26*atan2(y,z)) +sin(26*atan2(z,x))>0 		
+			*/	
 				if(minZ>t[i])minZ=t[i];
 				if(maxZ<t[i])maxZ=t[i];
 			}
