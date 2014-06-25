@@ -129,8 +129,8 @@ public	float readFloat( DataInputStream objBinaryReader){
 			  return amesh;
 	}
 	@SuppressWarnings({ "resource", "static-access" })
-	public ArrayList<PVector> readGCodeFile(String fileName){
-		ArrayList<PVector>  pts=new 	ArrayList<PVector>  ();
+	public OnPolyline readGCodeFile(String fileName){
+		OnPolyline pts=new 	OnPolyline();
 		float lx = 0;
 		float ly = 0;
 		float lz = 0;
@@ -157,7 +157,7 @@ public	float readFloat( DataInputStream objBinaryReader){
 							if(zz.length==2)Z+=0.2f;//Float.parseFloat(zz[1]);	
 							lx=X;ly=Y;lz=Z;
 			}
-				pts.add(new PVector(X,Y,Z));			
+				pts.add(new On3dPoint(X,Y,Z));			
 			}
 			}
 			}
