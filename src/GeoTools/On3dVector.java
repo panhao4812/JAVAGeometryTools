@@ -64,6 +64,9 @@ public class On3dVector {
 	        this.div(m);
 	     }
 	  }
+	public void Reverse(){
+		this.mul(-1);		
+	}
 	public void mul( On3dVector v )
 	  {
 	    x *= v.x;
@@ -166,10 +169,17 @@ public class On3dVector {
 	  return (a != 0.0) ? true : false;
 	}
 	//////////////////////////////////////////
+	  public static On3dVector VectorReverse(On3dVector a){
+		  return new On3dVector( -a.x, -a.y, -a.z);
+	  }
 	  public static On3dVector VectorAdd( On3dVector a, On3dVector b )
 	  {
 	    return new On3dVector( a.x+b.x, a.y+b.y, a.z+b.z );
 	  }
+	 public static On3dVector VectorSub( On3dPoint a, On3dPoint b )
+	  {
+	    return new On3dVector( a.x-b.x, a.y-b.y, a.z-b.z );
+	  } 
 	  public static On3dVector VectorSub( On3dVector a, On3dVector b )
 	  {
 	    return new On3dVector( a.x-b.x, a.y-b.y, a.z-b.z );

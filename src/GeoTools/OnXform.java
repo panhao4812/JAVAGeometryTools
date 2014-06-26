@@ -127,8 +127,8 @@ public float[][] get_m_xform(){
 		OnXform CB = new OnXform();
 		rc = CB.ChangeBasis(new On3dVector(1, 0, 0), new On3dVector(0, 1, 0),
 				new On3dVector(0, 0, 1), X1, Y1, Z1);
-		CB.mul(T1);
-		CB.mul(F0);
+		CB.Mul(T1);
+		CB.Mul(F0);
 		// System.out.println("cb="+CB.ToString());
 		this.m_xform = CB.m_xform;
 		return rc;
@@ -208,7 +208,7 @@ public float[][] get_m_xform(){
 		}
 	}
 
-	public void mul(OnXform rhs) {
+	public void Mul(OnXform rhs) {
 		float m[][] = new float[4][4];
 		float p[] = new float[16];
 		int index = 0;
@@ -254,53 +254,6 @@ public float[][] get_m_xform(){
 				* p[11] + m_xform[3][3] * p[15];
 
 		this.m_xform = m;
-	}
-
-	public static OnXform XformMul(OnXform xf1, OnXform rhs) {
-		float m[][] = new float[4][4];
-		float p[] = new float[16];
-		int index = 0;
-		for (int i = 0; i < rhs.m_xform.length; i++) {
-			for (int j = 0; j < rhs.m_xform[i].length; j++) {
-				p[index++] = rhs.m_xform[i][j];
-			}
-		}
-		m[0][0] = xf1.m_xform[0][0] * p[0] + xf1.m_xform[0][1] * p[4]
-				+ xf1.m_xform[0][2] * p[8] + xf1.m_xform[0][3] * p[12];
-		m[0][1] = xf1.m_xform[0][0] * p[1] + xf1.m_xform[0][1] * p[5]
-				+ xf1.m_xform[0][2] * p[9] + xf1.m_xform[0][3] * p[13];
-		m[0][2] = xf1.m_xform[0][0] * p[2] + xf1.m_xform[0][1] * p[6]
-				+ xf1.m_xform[0][2] * p[10] + xf1.m_xform[0][3] * p[14];
-		m[0][3] = xf1.m_xform[0][0] * p[3] + xf1.m_xform[0][1] * p[7]
-				+ xf1.m_xform[0][2] * p[11] + xf1.m_xform[0][3] * p[15];
-
-		m[1][0] = xf1.m_xform[1][0] * p[0] + xf1.m_xform[1][1] * p[4]
-				+ xf1.m_xform[1][2] * p[8] + xf1.m_xform[1][3] * p[12];
-		m[1][1] = xf1.m_xform[1][0] * p[1] + xf1.m_xform[1][1] * p[5]
-				+ xf1.m_xform[1][2] * p[9] + xf1.m_xform[1][3] * p[13];
-		m[1][2] = xf1.m_xform[1][0] * p[2] + xf1.m_xform[1][1] * p[6]
-				+ xf1.m_xform[1][2] * p[10] + xf1.m_xform[1][3] * p[14];
-		m[1][3] = xf1.m_xform[1][0] * p[3] + xf1.m_xform[1][1] * p[7]
-				+ xf1.m_xform[1][2] * p[11] + xf1.m_xform[1][3] * p[15];
-
-		m[2][0] = xf1.m_xform[2][0] * p[0] + xf1.m_xform[2][1] * p[4]
-				+ xf1.m_xform[2][2] * p[8] + xf1.m_xform[2][3] * p[12];
-		m[2][1] = xf1.m_xform[2][0] * p[1] + xf1.m_xform[2][1] * p[5]
-				+ xf1.m_xform[2][2] * p[9] + xf1.m_xform[2][3] * p[13];
-		m[2][2] = xf1.m_xform[2][0] * p[2] + xf1.m_xform[2][1] * p[6]
-				+ xf1.m_xform[2][2] * p[10] + xf1.m_xform[2][3] * p[14];
-		m[2][3] = xf1.m_xform[2][0] * p[3] + xf1.m_xform[2][1] * p[7]
-				+ xf1.m_xform[2][2] * p[11] + xf1.m_xform[2][3] * p[15];
-
-		m[3][0] = xf1.m_xform[3][0] * p[0] + xf1.m_xform[3][1] * p[4]
-				+ xf1.m_xform[3][2] * p[8] + xf1.m_xform[3][3] * p[12];
-		m[3][1] = xf1.m_xform[3][0] * p[1] + xf1.m_xform[3][1] * p[5]
-				+ xf1.m_xform[3][2] * p[9] + xf1.m_xform[3][3] * p[13];
-		m[3][2] = xf1.m_xform[3][0] * p[2] + xf1.m_xform[3][1] * p[6]
-				+ xf1.m_xform[3][2] * p[10] + xf1.m_xform[3][3] * p[14];
-		m[3][3] = xf1.m_xform[3][0] * p[3] + xf1.m_xform[3][1] * p[7]
-				+ xf1.m_xform[3][2] * p[11] + xf1.m_xform[3][3] * p[15];
-		return new OnXform(m);
 	}
 
 	public void Translation(On3dVector v) {
@@ -498,8 +451,8 @@ public float[][] get_m_xform(){
 			s.Scale(scale_factor, scale_factor, scale_factor);
 			t1.Translation(On3dPoint.PointSub(fixed_point, new On3dPoint()));
 			this.m_xform = t1.get_m_xform();
-			this.mul(s);
-			this.mul(t0);
+			this.Mul(s);
+			this.Mul(t0);
 		}
 	}
 
@@ -534,10 +487,11 @@ public float[][] get_m_xform(){
 		s1.m_xform[2][2] = z1.z;
 		t1.Translation(On3dPoint.PointSub(plane.origin, new On3dPoint()));
 		this.m_xform = t1.get_m_xform();
-		this.mul(s1);
-		this.mul(s0);
-		this.mul(t0);
+		this.Mul(s1);
+		this.Mul(s0);
+		this.Mul(t0);
 	}
+
 	public static void DrawWhiteGrid(PApplet p) {
 		float gridSize = 4;
 		// strokeWeight(0.5f);
@@ -612,7 +566,6 @@ public float[][] get_m_xform(){
 		// stroke(0,0,255);
 		// line(0,0,0,0,0,254);
 	}
-
 	public static void CreatCoordinateSystem(PApplet p) {
 		p.pushMatrix();
 		p.stroke(255, 0, 0);
@@ -623,5 +576,91 @@ public float[][] get_m_xform(){
 		p.line(0, 0, 0, 0, 0, 500);
 		p.popMatrix();
 
+	}
+	public static OnXform XformMul(OnXform xf1, OnXform rhs) {
+		float m[][] = new float[4][4];
+		float p[] = new float[16];
+		int index = 0;
+		for (int i = 0; i < rhs.m_xform.length; i++) {
+			for (int j = 0; j < rhs.m_xform[i].length; j++) {
+				p[index++] = rhs.m_xform[i][j];
+			}
+		}
+		m[0][0] = xf1.m_xform[0][0] * p[0] + xf1.m_xform[0][1] * p[4]
+				+ xf1.m_xform[0][2] * p[8] + xf1.m_xform[0][3] * p[12];
+		m[0][1] = xf1.m_xform[0][0] * p[1] + xf1.m_xform[0][1] * p[5]
+				+ xf1.m_xform[0][2] * p[9] + xf1.m_xform[0][3] * p[13];
+		m[0][2] = xf1.m_xform[0][0] * p[2] + xf1.m_xform[0][1] * p[6]
+				+ xf1.m_xform[0][2] * p[10] + xf1.m_xform[0][3] * p[14];
+		m[0][3] = xf1.m_xform[0][0] * p[3] + xf1.m_xform[0][1] * p[7]
+				+ xf1.m_xform[0][2] * p[11] + xf1.m_xform[0][3] * p[15];
+
+		m[1][0] = xf1.m_xform[1][0] * p[0] + xf1.m_xform[1][1] * p[4]
+				+ xf1.m_xform[1][2] * p[8] + xf1.m_xform[1][3] * p[12];
+		m[1][1] = xf1.m_xform[1][0] * p[1] + xf1.m_xform[1][1] * p[5]
+				+ xf1.m_xform[1][2] * p[9] + xf1.m_xform[1][3] * p[13];
+		m[1][2] = xf1.m_xform[1][0] * p[2] + xf1.m_xform[1][1] * p[6]
+				+ xf1.m_xform[1][2] * p[10] + xf1.m_xform[1][3] * p[14];
+		m[1][3] = xf1.m_xform[1][0] * p[3] + xf1.m_xform[1][1] * p[7]
+				+ xf1.m_xform[1][2] * p[11] + xf1.m_xform[1][3] * p[15];
+
+		m[2][0] = xf1.m_xform[2][0] * p[0] + xf1.m_xform[2][1] * p[4]
+				+ xf1.m_xform[2][2] * p[8] + xf1.m_xform[2][3] * p[12];
+		m[2][1] = xf1.m_xform[2][0] * p[1] + xf1.m_xform[2][1] * p[5]
+				+ xf1.m_xform[2][2] * p[9] + xf1.m_xform[2][3] * p[13];
+		m[2][2] = xf1.m_xform[2][0] * p[2] + xf1.m_xform[2][1] * p[6]
+				+ xf1.m_xform[2][2] * p[10] + xf1.m_xform[2][3] * p[14];
+		m[2][3] = xf1.m_xform[2][0] * p[3] + xf1.m_xform[2][1] * p[7]
+				+ xf1.m_xform[2][2] * p[11] + xf1.m_xform[2][3] * p[15];
+
+		m[3][0] = xf1.m_xform[3][0] * p[0] + xf1.m_xform[3][1] * p[4]
+				+ xf1.m_xform[3][2] * p[8] + xf1.m_xform[3][3] * p[12];
+		m[3][1] = xf1.m_xform[3][0] * p[1] + xf1.m_xform[3][1] * p[5]
+				+ xf1.m_xform[3][2] * p[9] + xf1.m_xform[3][3] * p[13];
+		m[3][2] = xf1.m_xform[3][0] * p[2] + xf1.m_xform[3][1] * p[6]
+				+ xf1.m_xform[3][2] * p[10] + xf1.m_xform[3][3] * p[14];
+		m[3][3] = xf1.m_xform[3][0] * p[3] + xf1.m_xform[3][1] * p[7]
+				+ xf1.m_xform[3][2] * p[11] + xf1.m_xform[3][3] * p[15];
+		return new OnXform(m);
+	}
+	public static OnXform translation(On3dVector v){
+		OnXform xf=new OnXform();
+		xf.Translation(v);
+		return xf;
+	}
+	public static OnXform rotation(float t){
+		OnXform xf=new OnXform();
+		xf.Rotation(t,On3dVector.Zaxis(), new On3dPoint());
+		return xf;
+	}
+	public static OnXform rotation(float t,On3dPoint cen){
+		OnXform xf=new OnXform();
+		xf.Rotation(t, On3dVector.Zaxis(),cen);
+		return xf;
+	}
+	public static OnXform rotation(float t,On3dVector axis, On3dPoint cen){
+		OnXform xf=new OnXform();
+		xf.Rotation(t, axis,cen);
+		return xf;
+	}
+	public static OnXform rotation(float t,On3dPoint head, On3dPoint base){
+		OnXform xf=new OnXform();
+		xf.Rotation(t, On3dPoint.PointSub(base, head),base);
+		return xf;
+	}
+	public static OnXform scale(float t){
+		OnXform xf=new OnXform();
+		xf.Scale(t, t, t);
+		return xf;
+	}
+	public static OnXform scale(On3dPoint base,float t){
+		OnXform xf=new OnXform();
+		xf.Scale(base,t);
+		return xf;
+	}
+	public static OnXform scale1D(On3dPoint base,On3dVector v){
+		OnXform xf=new OnXform();
+		xf.Scale(new OnPlane(base,On3dVector.Zaxis()),v.x,v.y,v.z);
+		return xf;
 	}
 }
