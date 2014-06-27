@@ -1,4 +1,8 @@
 package charttest;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import GeoTools.*;
@@ -29,27 +33,78 @@ public void setup(){
 		slider.colors.add(color(0, 0, 255,80));	
 		slider.colors.add(color(255, 0, 255,80));	
 		slider.colors.add(color(255, 0, 0,80));	 
-float R=(float)height;
+
 font = createFont("simhei", 300, true);
 textureMode(NORMAL);	
-for(int i=0;i<60;i++){
-chart chart1=new chart(this,"²âÊÔ·½¿é",font,120,R,PI/30*i,PI/30);
 
-chart chart2=new chart(this,"T"+i+"A",font,120,R-120,PI/30*i,PI/60);
-chart chart3=new chart(this,"T"+i+"B",font,120,R-120,PI/30*i+PI/60,PI/60);
-chart1.color=slider.getGradient((float)i/60);
-chart1.ComputeEdge(3f);
-chart2.color=slider.getGradient((float)i/60);
-chart2.ComputeEdge(3f);
-chart3.color=slider.getGradient((float)(i+0.5f)/60);
-chart3.ComputeEdge(3f);
-charts.add(chart1);
-charts.add(chart2);
-charts.add(chart3);
+
+
+readText("bool1.csv");CombineCharts();
+for(int i=0;i<charts.size();i++){
+	charts.get(i).initializePic(font);
+	charts.get(i).ComputeEdge(3f);	
+	}
 }
-}
-public void readText(String name){
+public void CombineCharts(){
+	ArrayList<chart> charts2=new ArrayList<chart>();
+	charts2.add(charts.get(0));
+	for(int i=1;i<charts.size();i++){
+		boolean sign=true;
+		println("i:"+i+" id:"+charts.get(i).text);
+	for(int j=charts2.size()-1;j>=0;j--){
+		println("j:"+j+" id:"+charts2.get(j).text);
+		if(charts2.get(j).CombineHorizontalCharts(charts.get(i))){
+			sign=false;break;
+		}
+	}if(sign)charts2.add(charts.get(i));
+//	println(sign);
+	}
 	
+	charts=charts2;
+}
+
+public void readText(String fileName){
+	ArrayList<String>pts=new ArrayList<String>();
+	 try {  
+		  FileReader read = new FileReader(fileName);
+		   BufferedReader br = new BufferedReader(read);
+		   String row="";
+		   int blank=0;			
+		   while(blank<10){			  		 
+			   row = br.readLine();
+			   if(row!=null){			  
+				  blank=0;pts.add(row);			
+		      }else{
+			   blank++;	println("blanklines:"+blank);
+		   }
+		   }
+	  }catch (FileNotFoundException e) {				  
+		   println(e.toString());
+		  } catch (IOException e){
+			  println(e.toString());
+		  }
+	 //////////////
+	 float R=(float)height;
+String[][] str=new String[pts.size()][];
+	 for(int i=0;i<pts.size();i++){
+		 str[i]= pts.get(i).split(",",-1);	 
+		 println(str[i].length);
+	 }	
+	for(int i=0;i<pts.size();i++){ 
+	     if (str[i][0].equals("class")){
+	    	 for(int j=1;j<str[i].length;j++){
+	    		 if(str[i][j].equals("")){
+	    			 str[i][j]=str[i][j-1];
+	    		 }    	    
+	    		 chart c=new chart(this,str[i][j]);
+	    c.hei=100f;c.r=R-100f*i;
+	    float t=str[0].length-1;
+	    c.rot=(float)j/t*PI*2;
+	    c.range=1f/t*PI*2;
+	    charts.add(c); 
+	    	 }
+	     }
+	}
 }
 public void draw(){
 	background(255);
@@ -60,35 +115,41 @@ public void draw(){
 }
 
 public class chart{
-	private float hei=0;
-	private float r=0;
-	private float rot=0;
-	private float range=0;
-  
+	public float hei=0;
+	public float r=0;
+	public float rot=0;
+	public float range=0;
+    public String text="";
+    public int letterSize=100;
+    
 	private OnMesh m_mesh;
 	private MeshTopologyEdgeList el;
 	private int color;
 	private  PImage G;
 	PApplet p;
 	On3dPoint pos1,pos2,pos3,pos4;
-public chart(PApplet parent,String text,PFont font,	
+	public 	chart(PApplet parent,String Text){
+		this.p=parent;text=Text;
+		m_mesh=new OnMesh();
+		color=p.color(255);
+	}
+public chart(PApplet parent,String Text,	
 		float Hei,float R,float Rot,float Range){
-	this.p=parent;
-    hei=Hei; r=R;rot=Rot;range=Range;
+	this.p=parent;text=Text;  
+    hei=Hei; r=R;rot=Rot;range=Range; 
 	m_mesh=new OnMesh();
 	color=p.color(255);
-	initializePic(100,text,font);
 }
- void initializePic(int letterSize,String str,PFont font){	
+public void initializePic(PFont font){	
 	//println(str.length());
-	   PGraphics  g = p.createGraphics(letterSize* str.length(), letterSize, JAVA2D);     
+	   PGraphics  g = p.createGraphics(letterSize* text.length()/2, letterSize, JAVA2D);     
 		  g.beginDraw();
-		  g.background(color(255, 255, 255,0));
+		  g.background(color(255,0));
 		  g.fill(0);
 		  g.textAlign(CENTER, CENTER);
 		  g.textFont(font);
 		  g.textSize(letterSize);
-		  g.text(str, letterSize* str.length()/2,(int)((float)letterSize/2.5));
+		  g.text(text, g.width/2,g.height/2.5f);
 		  g.endDraw();
 		  G=(PImage)g;	
 }
@@ -125,7 +186,7 @@ public void ComputeEdge(float offset){
 public void draw(){
 	p.noStroke();//p.stroke(0,60);
     p.fill(this.color);
-	//m_mesh.draw(p);	
+	m_mesh.draw(p);	
 	p.pushMatrix();
 	p.beginShape();
 	texture(G);
@@ -136,12 +197,25 @@ public void draw(){
 	p.endShape();
 	p.popMatrix();
 	
-	p.stroke(p.color(this.color,60));
+	p.stroke(p.color(0));
 	el.drawProfile(p);
 }
-
+public final boolean CombineHorizontalCharts(chart C){
+	if(this.r==C.r && this.hei==C.hei && this.text.equals(C.text)){
+this.range+=C.range;
+if(C.rot<rot)rot=C.rot;
+return true;}
+return false;
 }
+public final boolean CombineVerticalCharts(chart C){
+	if(this.range==C.range && this.rot==C.rot && this.text.equals(C.text)){
+		this.hei+=C.hei;if(C.r<r)r=C.r;
+		return true;}
+		return false;
+}
+}
+///////
 }
 ///////////////////////
-/*fhfyjngkm
+/*²âÊÔ2
 */
