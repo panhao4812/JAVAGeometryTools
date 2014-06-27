@@ -10,7 +10,7 @@ public class test2 extends PApplet {
 	PeasyCam cam;
 	OnMesh amesh;
 	fireImport iprt;
-	 
+	MeshTopologyEdgeList el;
 	 
 	 public void setup() {
 		 size(600, 400, OPENGL);
@@ -20,19 +20,23 @@ public class test2 extends PApplet {
 			cam.setMinimumDistance(50);
 			cam.setMaximumDistance(5000);	
 			println(amesh.Points.size()+"/"+amesh.faces.size());
-			amesh.CombineIdenticalVertices();
+			el=amesh.TopologyEdgeList();
 			OnXform xf=new OnXform();
 			xf.Rotation(On3dVector.Yaxis(),On3dVector.Zaxis(),new On3dPoint());
 			amesh.Transform(xf);
 			xf=new OnXform();
 			xf.Scale(new On3dPoint(1,1,0), 5);
-			amesh.Transform(xf);
+			amesh.Transform(xf);	
 	 }
 	 public void draw() {
 			background(30);
+		
 			OnXform.DrawWhiteGrid(this);
 			fill(255);
 			stroke(0,20);
-			amesh.draw(this,1);  
+			amesh.draw(this,1); 
+			stroke(255,60,255);
+			strokeWeight(3);
+			el.drawProfile(this);
 	 }
 }

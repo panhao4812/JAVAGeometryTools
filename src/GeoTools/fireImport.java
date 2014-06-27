@@ -9,10 +9,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.ArrayList;
-
 import processing.core.PApplet;
-import processing.core.PVector;
 
 public  class  fireImport {
 	PApplet p;

@@ -14,7 +14,8 @@ public class test extends PApplet {
 	float Range=0,Dir=0.5f;
 	ControlFrame cf;
 	On3dVector dir;
-	float minZ=PI,maxZ=0;float range2=0;float Dir2=0;
+	MeshTopologyEdgeList el1;
+	float minZ=PI,maxZ=0;float range2=3;float Dir2=3;
 	ControlFrame addControlFrame(String theName, int theWidth, int theHeight) {
 		  Frame f = new Frame(theName);
 		  ControlFrame p = new ControlFrame(this, theWidth, theHeight);
@@ -71,7 +72,7 @@ public class test extends PApplet {
 	    	println(amesh4.Points.get(i).x+","+amesh4.Points.get(i).y+","+amesh4.Points.get(i).z);
 	    }	
 	    */ 
-	 
+	    caculate();
 	}
 	float[] t;
 	public void caculate(){
@@ -113,22 +114,22 @@ public class test extends PApplet {
 			*/
 
 	
-		OnMesh[] M= OnMesh.followlines2(amesh,amesh3,amesh4 ,t,Dir*(maxZ-minZ)+minZ);
+		OnMesh[] M= MeshCreation.followlines2(amesh,amesh3,amesh4 ,t,Dir*(maxZ-minZ)+minZ);
 		amesh3=M[0];amesh4=M[1];
-	
+		el1=amesh3.TopologyEdgeList();
            // print("m3 "+ amesh3.VertexCount());
            // print("m4 "+ amesh4.VertexCount());
 		    //return new OnMesh();
 	}
 	
 	public void draw() {
-		background(30);
+		background(230);
 		if((Range!=range2 )||(Dir!=Dir2)){ 
 			caculate();
 			range2=Range;
 			Dir2=Dir;
 		}
-		OnXform.DrawWhiteGrid(this);
+		OnXform.DrawDarkGrid(this);
     if (amesh.VertexCount()>0){
     
    
@@ -143,6 +144,8 @@ public class test extends PApplet {
     	amesh3.draw(this,1);  
     	fill(90,170,125);
        if(keyPressed)  amesh4.draw(this,1);
+       stroke(20,20,20);
+       el1.drawProfile(this);
     }   
 	}
 

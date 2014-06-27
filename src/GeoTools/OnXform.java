@@ -493,6 +493,7 @@ public float[][] get_m_xform(){
 	}
 
 	public static void DrawWhiteGrid(PApplet p) {
+		p.strokeWeight(1);
 		float gridSize = 4;
 		// strokeWeight(0.5f);
 		for (int x = -64; x < 65; x++) {
@@ -530,6 +531,7 @@ public float[][] get_m_xform(){
 		// line(0,0,0,0,0,254);
 	}
 	public static void DrawDarkGrid(PApplet p) {
+		p.strokeWeight(1);
 		float gridSize = 4;
 		// strokeWeight(0.5f);
 		for (int x = -64; x < 65; x++) {
@@ -567,6 +569,7 @@ public float[][] get_m_xform(){
 		// line(0,0,0,0,0,254);
 	}
 	public static void CreatCoordinateSystem(PApplet p) {
+		p.strokeWeight(1);
 		p.pushMatrix();
 		p.stroke(255, 0, 0);
 		p.line(0, 0, 0, 500, 0, 0);
