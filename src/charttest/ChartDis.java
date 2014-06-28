@@ -37,8 +37,6 @@ public void setup(){
 font = createFont("simhei", 300, true);
 textureMode(NORMAL);	
 
-
-
 readText("bool1.csv");CombineCharts();
 for(int i=0;i<charts.size();i++){
 	charts.get(i).initializePic(font);
@@ -50,9 +48,9 @@ public void CombineCharts(){
 	charts2.add(charts.get(0));
 	for(int i=1;i<charts.size();i++){
 		boolean sign=true;
-		println("i:"+i+" id:"+charts.get(i).text);
+		//println("i:"+i+" id:"+charts.get(i).text);
 	for(int j=charts2.size()-1;j>=0;j--){
-		println("j:"+j+" id:"+charts2.get(j).text);
+		//println("j:"+j+" id:"+charts2.get(j).text);
 		if(charts2.get(j).CombineHorizontalCharts(charts.get(i))){
 			sign=false;break;
 		}
@@ -60,6 +58,20 @@ public void CombineCharts(){
 //	println(sign);
 	}
 	
+	charts=charts2;
+    charts2=new ArrayList<chart>();
+	charts2.add(charts.get(0));
+	for(int i=1;i<charts.size();i++){
+		boolean sign=true;
+		//println("i:"+i+" id:"+charts.get(i).text);
+	for(int j=charts2.size()-1;j>=0;j--){
+		//println("j:"+j+" id:"+charts2.get(j).text);
+		if(charts2.get(j).CombineVerticalCharts(charts.get(i))){
+			sign=false;break;
+		}
+	}if(sign)charts2.add(charts.get(i));
+//	println(sign);
+	}
 	charts=charts2;
 }
 
@@ -86,17 +98,32 @@ public void readText(String fileName){
 	 //////////////
 	 float R=(float)height;
 String[][] str=new String[pts.size()][];
+String[][] str2=new String[pts.size()][];	
 	 for(int i=0;i<pts.size();i++){
 		 str[i]= pts.get(i).split(",",-1);	 
-		 println(str[i].length);
-	 }	
+		 str2[i]= pts.get(i).split(",",-1);	 
+		// println(str[i].length);
+	 }		 
 	for(int i=0;i<pts.size();i++){ 
 	     if (str[i][0].equals("class")){
 	    	 for(int j=1;j<str[i].length;j++){
-	    		 if(str[i][j].equals("")){
-	    			 str[i][j]=str[i][j-1];
-	    		 }    	    
-	    		 chart c=new chart(this,str[i][j]);
+	    		 if(str[i][j].equals("")){	
+	    			
+	    			 if(i>0){
+	    			 if(!str[i-1][j].equals("")){str2[i][j]=str[i-1][j];}
+	    			 else if(!str[i][j-1].equals("")){str2[i][j]=str[i][j-1];}
+	    			 else if(str[i-1][j].equals("")&& str[i][j-1].equals("")&& str2[i-1][j].equals(str2[i][j-1]))
+	    				{str2[i][j]=str2[i-1][j];    				
+	    				}	    			 
+	    			 else {str2[i][j]=str2[i][j-1];}   	    			 
+	    			// println(str[i-1][j]+"/"+str[i][j-1]+"/"+str2[i][j]);
+	    			 }	    			 
+	    			 else{
+	    				 str2[i][j]=str2[i][j-1]; 
+	    			 }
+	    		 } 
+	    		// println("text="+str2[i][j]);
+	    		 chart c=new chart(this,str2[i][j]);
 	    c.hei=100f;c.r=R-100f*i;
 	    float t=str[0].length-1;
 	    c.rot=(float)j/t*PI*2;
@@ -142,6 +169,7 @@ public chart(PApplet parent,String Text,
 }
 public void initializePic(PFont font){	
 	//println(str.length());
+	if(text.equals(""))text="null";
 	   PGraphics  g = p.createGraphics(letterSize* text.length()/2, letterSize, JAVA2D);     
 		  g.beginDraw();
 		  g.background(color(255,0));
