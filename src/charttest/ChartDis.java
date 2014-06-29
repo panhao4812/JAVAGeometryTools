@@ -18,6 +18,8 @@ static On3dPoint center=new On3dPoint(0,0,0);
 PeasyCam cam;
 MeshCreation mc=new MeshCreation();
 ArrayList<chart> charts;
+ArrayList<On3dPoint> locs;
+ArrayList<OnPolyline> projs;
 PFont font;
 ColorSlider slider;
 public void setup(){
@@ -36,7 +38,6 @@ public void setup(){
 
 font = createFont("simhei", 300, true);
 textureMode(NORMAL);	
-
 readText("bool1.csv");CombineCharts();
 for(int i=0;i<charts.size();i++){
 	charts.get(i).initializePic(font);
@@ -96,14 +97,21 @@ public void readText(String fileName){
 			  println(e.toString());
 		  }
 	 //////////////
-	 float R=(float)height;
+	 float R=(float)height*0.9f;
 String[][] str=new String[pts.size()][];
 String[][] str2=new String[pts.size()][];	
+locs=new ArrayList<On3dPoint>();
+projs=new ArrayList<OnPolyline>();
 	 for(int i=0;i<pts.size();i++){
 		 str[i]= pts.get(i).split(",",-1);	 
 		 str2[i]= pts.get(i).split(",",-1);	 
-		// println(str[i].length);
-	 }		 
+		// println(str[i].length);	
+	 }		
+	 for(int j=1;j<str[0].length;j++){
+		 float t1=(float)(j+0.5f)/(str[0].length-1)*PI*2;
+		 float R1=R-72.1f*2;
+	 locs.add(new On3dPoint(cos(t1)*R1,sin(t1)*R1,0));	 
+	 }
 	for(int i=0;i<pts.size();i++){ 
 	     if (str[i][0].equals("class")){
 	    	 for(int j=1;j<str[i].length;j++){
@@ -124,20 +132,46 @@ String[][] str2=new String[pts.size()][];
 	    		 } 
 	    		// println("text="+str2[i][j]);
 	    		 chart c=new chart(this,str2[i][j]);
-	    c.hei=100f;c.r=R-100f*i;
+	    c.hei=72f;c.r=R-72f*i;
 	    float t=str[0].length-1;
 	    c.rot=(float)j/t*PI*2;
 	    c.range=1f/t*PI*2;
 	    charts.add(c); 
 	    	 }
 	     }
+	     else   if (str[i][0].equals("project")){   
+	     OnPolyline pl=new OnPolyline();
+	     for(int j=1;j<str[i].length;j++){
+    		 if(!str[i][j].equals("")){	
+    			 pl.add(locs.get(j-1));
+    		 }
+	     }
+	     pl.add(pl.get(0));
+	     println(pl.size());
+	     projs.add(pl);
+	     } 
 	}
 }
 public void draw(){
-	background(255);
-	OnXform.DrawDarkGrid(this);
+	background(255);noFill();
+	//OnXform.DrawDarkGrid(this);
 	for(int i=0;i<charts.size();i++){
 	charts.get(i).draw();	
+	}
+	for(int i=0;i<locs.size();i++){
+		mc.drawPoints(this, locs.get(i));
+	}
+	for(int i=0;i<projs.size();i++){
+		//projs.get(i).draw(this, 1);
+		stroke(i*255f/(projs.size()-1),255-i*255f/(projs.size()-1),0);
+		OnPolyline pl=(OnPolyline)projs.get(i);
+		for(int j=1;j<pl.size();j++){
+			bezier(pl.get(j-1).x,pl.get(j-1).y,pl.get(j-1).z+1,				
+					pl.get(j-1).x/2,pl.get(j-1).y/2,(pl.get(j-1).z+1)/2,
+					pl.get(j).x/2,pl.get(j).y/2,(pl.get(j).z+1)/2,				
+					pl.get(j).x,pl.get(j).y,pl.get(j).z+1
+					);
+		}
 	}
 }
 

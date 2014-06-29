@@ -1,6 +1,8 @@
 package GeoTools;
 
 import java.util.ArrayList;
+
+import processing.core.PApplet;
 public class MeshCreation {
 	public MeshCreation(){}
     public OnMesh MeshLoft(OnPolyline pl1, OnPolyline pl2, boolean isPolyClosed, boolean isClosed)
@@ -367,4 +369,10 @@ public class MeshCreation {
  		{ 0, 1, 2, 0, 1, 0, 1,1 }, 
  		{ 2, 0, 1, 2, 0, 2, 0, 0 },
  		{ -2, -2, -2, -2, -1, -1, -1, -1 }, };
+ 	public  void drawPoints(PApplet p,On3dPoint pt){
+ 		p.pushMatrix();	
+ 	    p.translate(pt.x, pt.y, pt.z);
+        p.box(1);
+ 		p.popMatrix();
+ 	}
 }

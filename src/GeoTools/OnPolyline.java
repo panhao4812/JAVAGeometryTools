@@ -57,4 +57,15 @@ public class OnPolyline{
 		p.endShape();
 		p.popMatrix();
 	}
+	public void drawCurve(PApplet p,float scale){
+		if(this.m_points.size()<2)return;
+		p.pushMatrix();
+		p.scale(scale);
+		p.beginShape();
+		for(int i=1;i<this.m_points.size();i++){
+		p.curveVertex(this.m_points.get(i).x, this.m_points.get(i).y, this.m_points.get(i).z);
+	}
+		p.endShape();
+		p.popMatrix();
+	}
 }
