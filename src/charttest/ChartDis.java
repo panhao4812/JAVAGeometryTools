@@ -19,7 +19,7 @@ PeasyCam cam;
 MeshCreation mc=new MeshCreation();
 ArrayList<chart> charts;
 ArrayList<On3dPoint> locs;
-ArrayList<OnPolyline> projs;
+ArrayList<OnPolyline> projs, projs2;
 PFont font;
 ColorSlider slider;
 public void setup(){
@@ -43,6 +43,23 @@ for(int i=0;i<charts.size();i++){
 	charts.get(i).initializePic(font);
 	charts.get(i).ComputeEdge(3f);	
 	}
+
+projs2 =new ArrayList<OnPolyline>();
+for(int i=0;i<projs.size();i++){
+	//projs.get(i).draw(this, 1);
+	
+	OnPolyline pl=(OnPolyline)projs.get(i);
+	for(int j=1;j<pl.size();j++){
+		OnPolyline pl2=new OnPolyline();
+		pl2.add(new On3dPoint( pl.get(j-1).x,pl.get(j-1).y,pl.get(j-1).z+1));				
+		pl2.add(new On3dPoint(	pl.get(j-1).x/2,pl.get(j-1).y/2,(pl.get(j-1).z+1)/2));
+		pl2.add(new On3dPoint(	pl.get(j).x/2,pl.get(j).y/2,(pl.get(j).z+1)/2));		
+		pl2.add(new On3dPoint(	pl.get(j).x,pl.get(j).y,pl.get(j).z+1));
+		pl2.ccSubdivide(4);
+		projs2.add(pl2);
+	}
+}
+
 }
 public void CombineCharts(){
 	ArrayList<chart> charts2=new ArrayList<chart>();
@@ -154,24 +171,16 @@ projs=new ArrayList<OnPolyline>();
 }
 public void draw(){
 	background(255);noFill();
-	//OnXform.DrawDarkGrid(this);
+	OnXform.DrawDarkGrid(this);
 	for(int i=0;i<charts.size();i++){
 	charts.get(i).draw();	
 	}
 	for(int i=0;i<locs.size();i++){
 		mc.drawPoints(this, locs.get(i));
 	}
-	for(int i=0;i<projs.size();i++){
-		//projs.get(i).draw(this, 1);
-		stroke(i*255f/(projs.size()-1),255-i*255f/(projs.size()-1),0);
-		OnPolyline pl=(OnPolyline)projs.get(i);
-		for(int j=1;j<pl.size();j++){
-			bezier(pl.get(j-1).x,pl.get(j-1).y,pl.get(j-1).z+1,				
-					pl.get(j-1).x/2,pl.get(j-1).y/2,(pl.get(j-1).z+1)/2,
-					pl.get(j).x/2,pl.get(j).y/2,(pl.get(j).z+1)/2,				
-					pl.get(j).x,pl.get(j).y,pl.get(j).z+1
-					);
-		}
+	for(int i=0;i<projs2.size();i++){
+		stroke(i*255f/(projs2.size()-1),255-i*255f/(projs2.size()-1),0);
+		projs2.get(i).draw(this, 1);
 	}
 }
 

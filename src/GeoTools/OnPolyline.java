@@ -21,7 +21,24 @@ public class OnPolyline {
 	public void add(On3dPoint pt) {
 		this.m_points.add(pt);
 	}
-
+	public void reverse(){
+		ArrayList<On3dPoint> m_points2=new ArrayList<On3dPoint>();
+		for(int i=m_points.size()-1;i>=0;i--){
+			m_points2.add(m_points.get(i));
+			}
+		this.m_points=m_points2;
+	}
+	public void add(OnPolyline pl) {	
+		if(pl.get(pl.size()-1).DistanceTo(m_points.get(m_points.size()-1))<0.001f){
+			pl.reverse();
+		}	
+	   if(pl.get(0).DistanceTo(m_points.get(m_points.size()-1))>0.001f){
+			this.m_points.add(pl.get(0));
+		}		
+		for(int i=1;i<pl.size();i++){
+		this.m_points.add(pl.get(i));
+		}
+	}	
 	public int size() {
 		return this.m_points.size();
 	}
