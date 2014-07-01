@@ -18,7 +18,7 @@ static On3dPoint center=new On3dPoint(0,0,0);
 PeasyCam cam;
 MeshCreation mc=new MeshCreation();
 ArrayList<chart> charts;
-ArrayList<On3dPoint> locs;
+ArrayList<On3dPoint> locs,loccen;
 ArrayList<OnPolyline> projs, projs2;
 PFont font;
 ColorSlider slider;
@@ -38,29 +38,53 @@ public void setup(){
 
 font = createFont("simhei", 300, true);
 textureMode(NORMAL);	
-readText("bool1.csv");CombineCharts();
+readText("bool1.csv");
+CombineCharts();
+ComputeCurve();
 for(int i=0;i<charts.size();i++){
 	charts.get(i).initializePic(font);
 	charts.get(i).ComputeEdge(3f);	
 	}
 
-projs2 =new ArrayList<OnPolyline>();
-for(int i=0;i<projs.size();i++){
-	//projs.get(i).draw(this, 1);
-	
-	OnPolyline pl=(OnPolyline)projs.get(i);
-	for(int j=1;j<pl.size();j++){
-		OnPolyline pl2=new OnPolyline();
-		pl2.add(new On3dPoint( pl.get(j-1).x,pl.get(j-1).y,pl.get(j-1).z+1));				
-		pl2.add(new On3dPoint(	pl.get(j-1).x/2,pl.get(j-1).y/2,(pl.get(j-1).z+1)/2));
-		pl2.add(new On3dPoint(	pl.get(j).x/2,pl.get(j).y/2,(pl.get(j).z+1)/2));		
-		pl2.add(new On3dPoint(	pl.get(j).x,pl.get(j).y,pl.get(j).z+1));
-		pl2.ccSubdivide(4);
-		projs2.add(pl2);
-	}
-}
+
+
+
 
 }
+public void ComputeCurve(){
+	loccen=new ArrayList<On3dPoint>();
+	for(float i=0;i<5;i++){
+		loccen.add(new On3dPoint(cos(i/5*PI*2)*200,sin(i/5*PI*2)*200,1));
+	}
+	projs2 =new ArrayList<OnPolyline>();
+	for(int i=0;i<projs.size();i++){
+		//projs.get(i).draw(this, 1);
+		OnPolyline pl=(OnPolyline)projs.get(i);
+		for(int j=1;j<pl.size();j++){
+			OnPolyline pl2=new OnPolyline();
+			On3dPoint p1=pl.get(j-1);
+			On3dPoint p2=pl.get(j);
+			On3dPoint p3=loccen.get(0);On3dPoint p4=loccen.get(0);
+			float dist1=p3.DistanceTo(p1);
+			float dist2=p4.DistanceTo(p2);
+			for(int k=1;k<loccen.size();k++){	
+				float t1=loccen.get(k).DistanceTo(p1);
+				float t2=loccen.get(k).DistanceTo(p2);
+			if(t1<dist1){dist1=t1;p3=loccen.get(k);}
+			if(t2<dist2){dist2=t2;p4=loccen.get(k);}
+		}
+			if(p3.DistanceTo(p4)>0.001)
+			{pl2.add(p1);pl2.add(p3);pl2.add(p4);pl2.add(p2);}
+			else{
+				pl2.add(p1);pl2.add(p3);pl2.add(p2);
+			}
+			pl2.ccSubdivide(4);
+			projs2.add(pl2);
+		}
+	}
+	
+}
+
 public void CombineCharts(){
 	ArrayList<chart> charts2=new ArrayList<chart>();
 	charts2.add(charts.get(0));
@@ -171,7 +195,7 @@ projs=new ArrayList<OnPolyline>();
 }
 public void draw(){
 	background(255);noFill();
-	OnXform.DrawDarkGrid(this);
+	//OnXform.DrawDarkGrid(this);
 	for(int i=0;i<charts.size();i++){
 	charts.get(i).draw();	
 	}
